@@ -10,14 +10,14 @@ export default function Home() {
   const { user, isLoading } = useUser()
 
   return (
-    <div className={styles.container}>
+    <div>
       <Head>
         <title>Costream.app</title>
       </Head>
 
-      <main className={styles.main}>
-        <Avatar className="absolute top-2 right-2" />
-        <YoutubeVideo />
+      <main className="h-screen w-screen bg-gray-900 grid grid-cols-5">
+        <Avatar />
+        <YoutubeVideo className="col-span-4" />
       </main>
     </div>
   )
