@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import Stream from '../components/Stream'
-import YouTubeVideo from '../components/YouTubeVideo'
+import YoutubeVideo from '../components/Youtube'
 import styles from '../styles/Home.module.css'
 import { useUser } from '../context/user'
 import { supabase } from '../utils/supabase'
@@ -15,7 +15,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
-        <YouTubeVideo id={'zUqIv5PvbGk'} />
+        <YoutubeVideo />
       </main>
     </div>
   )
