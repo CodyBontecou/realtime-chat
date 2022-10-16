@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import Stream from '../components/Stream'
+import Avatar from '../components/Avatar'
 import YoutubeVideo from '../components/Youtube'
 import styles from '../styles/Home.module.css'
 import { useUser } from '../context/user'
@@ -15,6 +16,7 @@ export default function Home() {
       </Head>
 
       <main className={styles.main}>
+        <Avatar className="absolute top-2 right-2" />
         <YoutubeVideo />
       </main>
     </div>

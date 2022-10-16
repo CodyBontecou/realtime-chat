@@ -20,6 +20,7 @@ const YoutubeVideo = () => {
       .eq('id', video.id)
   }
   const onPlayerReady: YouTubeProps['onReady'] = event => {
+    event.target.seekTo(video.current_time)
     event.target.playVideo()
   }
 
