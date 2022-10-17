@@ -1,19 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
 import YouTube, { YouTubeProps } from 'react-youtube'
+import { YouTubePlayer } from 'youtube-player/dist/types'
+
+import { useUser } from '../context/user'
 import { supabase } from '../utils/supabase'
 
 const YoutubeVideo = ({ className }) => {
-  const playerRef = useRef<YouTube | null>(null)
+  const { user } = useUser()
+  const playerRef = useRef<YouTubePlayer | null>(null)
   const [video, setVideo] = useState(null)
-
-  // getPlayer returns any
-  const getPlayer = () => {
-    if (playerRef && playerRef.current) {
-      return playerRef.current.getInternalPlayer()
-    }
-
-    return null
-  }
 
   const getVideo = async () => {
     let { data: videos, error } = await supabase.from('video').select('*')
@@ -32,28 +27,43 @@ const YoutubeVideo = ({ className }) => {
   }
 
   const onPlayerReady: YouTubeProps['onReady'] = event => {
+    playerRef.current = event.target
+
     event.target.seekTo(video?.current_time)
     event.target.playVideo()
-
-    playerRef.current = event.target
   }
 
+  const rlsUser = user?.id === video?.user
+
   const onPause: YouTubeProps['onPause'] = async event => {
-    await updateVideoPlaying(false, event.target.getCurrentTime())
+    if (rlsUser) {
+      await updateVideoPlaying(false, event.target.getCurrentTime())
+    }
   }
 
   const onPlay: YouTubeProps['onPlay'] = async event => {
-    await updateVideoPlaying(true, event.target.getCurrentTime())
+    if (rlsUser) {
+      await updateVideoPlaying(true, event.target.getCurrentTime())
+    }
   }
 
   const opts: YouTubeProps['opts'] = {
     height: '100%',
     width: '100%',
     playerVars: {
-      // https://developers.google.com/youtube/player_parameters
       autoplay: 1,
+      mute: 1,
+      modestbranding: true,
     },
   }
+
+  const videoIsPlaying = payload =>
+    payload.new.playing &&
+    playerRef.current.getPlayerState() !== YouTube.PlayerState.PLAYING
+
+  const videoIsPaused = payload =>
+    !payload.new.playing &&
+    playerRef.current.getPlayerState() !== YouTube.PlayerState.PAUSED
 
   useEffect(() => {
     // const player = getPlayer()
@@ -63,13 +73,10 @@ const YoutubeVideo = ({ className }) => {
       await supabase
         .from('video')
         .on('UPDATE', payload => {
-          console.log('Change received!', payload)
-          if (payload.new.playing) {
-            console.log(playerRef.current)
-            // @ts-ignore
+          if (videoIsPlaying(payload)) {
+            playerRef.current.seekTo(payload.new.current_time)
             playerRef.current.playVideo()
-          } else if (!payload.new.playing) {
-            // @ts-ignore
+          } else if (videoIsPaused(payload)) {
             playerRef.current.pauseVideo()
           }
         })
@@ -82,7 +89,7 @@ const YoutubeVideo = ({ className }) => {
   return (
     <YouTube
       className={className}
-      videoId="2g811Eo7K8U"
+      videoId="VOd28z9d-JU"
       opts={opts}
       onReady={onPlayerReady}
       onPause={onPause}
