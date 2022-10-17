@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useUser } from '../context/user'
 import Image from 'next/image'
 
-const Avatar = () => {
+const Avatar = ({ className }) => {
   const { user } = useUser()
 
   useEffect(() => {
@@ -10,7 +10,7 @@ const Avatar = () => {
   }, [])
 
   return (
-    <button className="absolute top-2 right-2">
+    <button className={className}>
       <Image
         className="rounded-full"
         width={40}
