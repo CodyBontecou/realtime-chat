@@ -12,6 +12,7 @@ const Provider = ({ children }) => {
 
   useEffect(() => {
     const getUserProfile = async () => {
+      console.log('getting user profile')
       const sessionUser = supabase.auth.user()
       if (sessionUser) {
         const { data: user } = await supabase
@@ -24,7 +25,6 @@ const Provider = ({ children }) => {
           ...sessionUser,
           ...user,
         })
-        setIsLoading(false)
       }
     }
 
@@ -38,21 +38,7 @@ const Provider = ({ children }) => {
       event: user ? 'SIGNED_IN' : 'SIGNED_OUT',
       session: supabase.auth.session(),
     })
-  }, [user])
-
-  useEffect(() => {
-    if (user) {
-      const subscription = supabase
-        .from(`user:id=eq${user.id}`)
-        .on('UPDATE', payload => {
-          setUser({ ...user, ...payload.new })
-        })
-        .subscribe()
-
-      return () => {
-        supabase.removeSubscription(subscription)
-      }
-    }
+    setIsLoading(false)
   }, [user])
 
   const login = async () => {
